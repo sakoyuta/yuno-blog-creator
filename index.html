@@ -8,25 +8,11 @@
 </head>
 <body>
 
-  <!-- APIキー設定画面 -->
-  <div id="setup-screen" class="screen hidden">
-    <div class="setup-box">
-      <div class="logo">YUNO HOME</div>
-      <h2>初期設定</h2>
-      <p>Gemini APIキーを入力してください。<br>一度設定すれば次回から不要です。</p>
-      <input type="password" id="api-key-input" placeholder="AIza..." autocomplete="off">
-      <button class="btn-primary" onclick="saveApiKey()">設定して始める</button>
-      <a href="https://aistudio.google.com/app/apikey" target="_blank" class="link">APIキーの取得方法</a>
-    </div>
-  </div>
-
-  <!-- メイン画面 -->
-  <div id="main-screen" class="screen hidden">
+  <div id="main-screen">
     <header>
       <div class="header-inner">
         <div class="logo">YUNO HOME</div>
         <span class="subtitle">ブログ記事作成ツール</span>
-        <button class="btn-settings" onclick="showSettings()" title="設定">⚙</button>
       </div>
     </header>
 
@@ -109,7 +95,6 @@
     </main>
   </div>
 
-  <!-- トースト通知 -->
   <div id="toast" class="toast hidden"></div>
 
   <script src="app.js"></script>
