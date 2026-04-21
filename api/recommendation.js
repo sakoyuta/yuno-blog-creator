@@ -4,14 +4,13 @@ export default async function handler(req, res) {
   }
 
   const { month, day } = req.body;
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
 
   if (!apiKey) {
     return res.status(500).json({ error: 'API key not configured' });
   }
 
-  const prompt = `
-あなたは注文住宅専門のSEOブログコンサルタントです。
+  const prompt = `あなたは注文住宅専門のSEOブログコンサルタントです。
 今日は${month}月${day}日です。
 
 季節感・住宅購入の検討時期・読者の関心タイミングを考慮して、
@@ -23,29 +22,30 @@ export default async function handler(req, res) {
   "category": "カテゴリ名（例：費用・資金計画）",
   "theme": "具体的な記事テーマ（例：太陽光発電で後悔した人に聞いた本音）",
   "reason": "このテーマをおすすめする理由（40字以内）"
-}
-`;
+}`;
 
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.8, maxOutputTokens: 512 }
-        })
-      }
-    );
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 512,
+        temperature: 0.8
+      })
+    });
 
     if (!response.ok) {
       const err = await response.json();
-      return res.status(response.status).json({ error: err.error?.message || 'Gemini API error' });
+      return res.status(response.status).json({ error: err.error?.message || 'Groq API error' });
     }
 
     const data = await response.json();
-    const text = data.candidates[0].content.parts[0].text;
+    const text = data.choices[0].message.content;
     const json = JSON.parse(text.replace(/```json\n?|\n?```/g, '').trim());
     return res.status(200).json(json);
   } catch (e) {
