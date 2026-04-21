@@ -10,31 +10,45 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'API key not configured' });
   }
 
-  const prompt = `あなたは注文住宅専門のSEOライターです。
+  const prompt = `あなたは住宅専門の雑誌ライターです。
 YUNO HOMEという住宅会社のブログ記事を書いてください。
+
+【YUNO HOMEについて】
+性能・デザイン・コスパの全てが高水準な住宅会社。
+多くの会社は「デザインが良いと性能が悪い」「性能が良いとデザインが悪い」というトレードオフがあるが、YUNO HOMEはそれを両立している。記事の中に自然な形で1〜2回盛り込む。
 
 【カテゴリ】${categoryLabel}
 ${themeHint ? `テーマの参考：「${themeHint}」` : ''}
-${keywordHint ? `必ずキーワード「${keywordHint}」を含めてください。` : ''}
+${keywordHint ? `必ずキーワード「${keywordHint}」を含めること。` : ''}
 
 【対象読者】
-- 注文住宅を検討中の施主候補
-- すでに家を建てた方（暮らしや後悔・改善点など）
+- 注文住宅を真剣に検討中の方
+- すでに家を建てた方（暮らし・後悔・改善点）
 
-【記事の条件】
+【文体・トーン】
+- 雑誌のようにテンポよく、リズム感がある
+- 短い文を重ねてスピード感を出す
+- 読者の「あるある」な悩みや失敗談から入る
+- 専門用語は使わない。でも信頼感がある
+- 具体的な数字・エピソード・比較を積極的に使う
+- 「〜です。〜です。〜です。」の繰り返しは絶対NG
+- 読者が「へぇ！」「わかる！」と思えるポイントを入れる
+
+【記事の構成】
 - 文字数：2,500〜3,500字
-- 語調：親しみやすく、専門的すぎず、信頼感がある
-- 構成：H2見出し3〜5個＋H3見出し複数
-- SEOを意識したタイトル（35字以内）
-- 冒頭200字以内に読者の悩みへの共感を入れる
-- 最後に「まとめ」セクションを入れる
-- Markdown形式で出力（# タイトル、## 見出し）
+- H2見出し：3〜5個（読者が思わず読みたくなるタイトルに）
+- H3見出し：各H2に2〜3個
+- 冒頭：読者の悩みへの共感から始める（200字以内）
+- 最後：「まとめ」セクション
+- Markdown形式（## 見出し、### 小見出し）
 
-【出力形式（この順番で必ず出力）】
-TITLE: （タイトルをここに）
-META: （メタディスクリプション120字以内をここに）
+【出力形式（必ずこの順番・この形式で出力すること）】
+TITLE_A: （よくある系：検索されやすいオーソドックスなタイトル・35字以内）
+TITLE_B: （煽り系：読者がドキッとする・好奇心を刺激するタイトル・35字以内）
+TITLE_C: （プッシュ系：読者の背中を押す・行動を促すタイトル・35字以内）
+META: （メタディスクリプション・120字以内）
 ---
-（本文をここに）`;
+（本文をここに・本文の中にTITLEやMETAは書かない）`;
 
   try {
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -47,7 +61,7 @@ META: （メタディスクリプション120字以内をここに）
         model: 'llama-3.3-70b-versatile',
         messages: [{ role: 'user', content: prompt }],
         max_tokens: 4096,
-        temperature: 0.8
+        temperature: 0.85
       })
     });
 
@@ -59,14 +73,18 @@ META: （メタディスクリプション120字以内をここに）
     const data = await response.json();
     const text = data.choices[0].message.content;
 
-    const titleMatch = text.match(/^TITLE:\s*(.+)/m);
-    const metaMatch = text.match(/^META:\s*(.+)/m);
-    const bodyMatch = text.match(/---\n([\s\S]+)/);
+    const titleAMatch = text.match(/^TITLE_A:\s*(.+)/m);
+    const titleBMatch = text.match(/^TITLE_B:\s*(.+)/m);
+    const titleCMatch = text.match(/^TITLE_C:\s*(.+)/m);
+    const metaMatch   = text.match(/^META:\s*(.+)/m);
+    const bodyMatch   = text.match(/---\n([\s\S]+)/);
 
     return res.status(200).json({
-      title: titleMatch ? titleMatch[1].trim() : '',
-      meta: metaMatch ? metaMatch[1].trim() : '',
-      body: bodyMatch ? bodyMatch[1].trim() : text
+      titleA: titleAMatch ? titleAMatch[1].trim() : '',
+      titleB: titleBMatch ? titleBMatch[1].trim() : '',
+      titleC: titleCMatch ? titleCMatch[1].trim() : '',
+      meta:   metaMatch   ? metaMatch[1].trim()   : '',
+      body:   bodyMatch   ? bodyMatch[1].trim()   : text
     });
   } catch (e) {
     return res.status(500).json({ error: e.message });

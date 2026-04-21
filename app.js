@@ -15,14 +15,11 @@ async function loadRecommendation() {
   el.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
 
   const today = new Date();
-  const month = today.getMonth() + 1;
-  const day = today.getDate();
-
   try {
     const res = await fetch('/api/recommendation', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ month, day })
+      body: JSON.stringify({ month: today.getMonth() + 1, day: today.getDate() })
     });
 
     if (!res.ok) {
@@ -46,16 +43,12 @@ async function createArticle() {
   const categoryVal = document.getElementById('category-select').value;
   const keyword = document.getElementById('keyword-input').value.trim();
 
-  let categoryLabel = '';
-  if (categoryVal === 'auto' && window._recommendation) {
-    categoryLabel = window._recommendation.category;
-  } else {
-    categoryLabel = CATEGORIES[categoryVal] || '注文住宅全般';
-  }
+  let categoryLabel = (categoryVal === 'auto' && window._recommendation)
+    ? window._recommendation.category
+    : (CATEGORIES[categoryVal] || '注文住宅全般');
 
   const themeHint = (categoryVal === 'auto' && window._recommendation)
-    ? window._recommendation.theme
-    : '';
+    ? window._recommendation.theme : '';
 
   const btn = document.getElementById('create-btn');
   btn.disabled = true;
@@ -74,14 +67,16 @@ async function createArticle() {
       throw new Error(err.error || 'サーバーエラー');
     }
 
-    const { title, meta, body } = await res.json();
+    const { titleA, titleB, titleC, meta, body } = await res.json();
 
-    document.getElementById('result-title').textContent = title;
+    document.getElementById('title-a').textContent = titleA;
+    document.getElementById('title-b').textContent = titleB;
+    document.getElementById('title-c').textContent = titleC;
     document.getElementById('result-meta-desc').textContent = meta;
     document.getElementById('result-body').textContent = body;
 
     const now = new Date();
-    document.getElementById('result-meta').textContent =
+    document.getElementById('result-meta-info').textContent =
       `生成：${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')} | ${categoryLabel}`;
 
     document.getElementById('result-card').classList.remove('hidden');
@@ -102,13 +97,8 @@ function copyText(elementId) {
     const original = btn.textContent;
     btn.textContent = 'コピー済み ✓';
     btn.classList.add('copied');
-    setTimeout(() => {
-      btn.textContent = original;
-      btn.classList.remove('copied');
-    }, 2000);
-  }).catch(() => {
-    showToast('コピーに失敗しました', 'error');
-  });
+    setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => showToast('コピーに失敗しました', 'error'));
 }
 
 function showToast(msg, type = '') {

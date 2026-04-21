@@ -55,7 +55,7 @@
 
         <button class="btn-create" id="create-btn" onclick="createArticle()">
           <span class="btn-text">記事を作成する</span>
-          <span class="btn-loading hidden">生成中...</span>
+          <span class="btn-loading hidden">生成中...（30〜60秒かかります）</span>
         </button>
       </section>
 
@@ -63,25 +63,52 @@
       <section class="card result-card hidden" id="result-card">
         <div class="result-header">
           <h3>生成された記事</h3>
-          <span id="result-meta" class="result-meta"></span>
+          <span id="result-meta-info" class="result-meta"></span>
         </div>
 
+        <!-- タイトル3パターン -->
         <div class="result-section">
-          <div class="result-label">
-            <span>タイトル</span>
-            <button class="btn-copy" onclick="copyText('result-title')">コピー</button>
+          <div class="section-title-bar">
+            <span class="section-label">タイトル <span class="tag tag-3">3パターン</span></span>
           </div>
-          <div class="result-box" id="result-title"></div>
+
+          <div class="title-option">
+            <div class="title-option-label">
+              <span class="tag tag-normal">よくある系</span>
+              <button class="btn-copy" onclick="copyText('title-a')">コピー</button>
+            </div>
+            <div class="result-box" id="title-a"></div>
+          </div>
+
+          <div class="title-option">
+            <div class="title-option-label">
+              <span class="tag tag-hot">煽り系</span>
+              <button class="btn-copy" onclick="copyText('title-b')">コピー</button>
+            </div>
+            <div class="result-box" id="title-b"></div>
+          </div>
+
+          <div class="title-option">
+            <div class="title-option-label">
+              <span class="tag tag-push">プッシュ系</span>
+              <button class="btn-copy" onclick="copyText('title-c')">コピー</button>
+            </div>
+            <div class="result-box" id="title-c"></div>
+          </div>
         </div>
 
+        <!-- メタディスクリプション -->
         <div class="result-section">
           <div class="result-label">
-            <span>メタディスクリプション <span class="seo-badge">SEO</span></span>
+            <span>メタディスクリプション <span class="seo-badge">SEO</span>
+              <span class="meta-tip">検索結果に表示される説明文</span>
+            </span>
             <button class="btn-copy" onclick="copyText('result-meta-desc')">コピー</button>
           </div>
           <div class="result-box" id="result-meta-desc"></div>
         </div>
 
+        <!-- 本文 -->
         <div class="result-section">
           <div class="result-label">
             <span>本文</span>
@@ -96,7 +123,6 @@
   </div>
 
   <div id="toast" class="toast hidden"></div>
-
   <script src="app.js"></script>
 </body>
 </html>
