@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YUNO HOME 記事作成ツール</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- APIキー設定画面 -->
+  <div id="setup-screen" class="screen hidden">
+    <div class="setup-box">
+      <div class="logo">YUNO HOME</div>
+      <h2>初期設定</h2>
+      <p>Gemini APIキーを入力してください。<br>一度設定すれば次回から不要です。</p>
+      <input type="password" id="api-key-input" placeholder="AIza..." autocomplete="off">
+      <button class="btn-primary" onclick="saveApiKey()">設定して始める</button>
+      <a href="https://aistudio.google.com/app/apikey" target="_blank" class="link">APIキーの取得方法</a>
+    </div>
+  </div>
+
+  <!-- メイン画面 -->
+  <div id="main-screen" class="screen hidden">
+    <header>
+      <div class="header-inner">
+        <div class="logo">YUNO HOME</div>
+        <span class="subtitle">ブログ記事作成ツール</span>
+        <button class="btn-settings" onclick="showSettings()" title="設定">⚙</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- おすすめ表示 -->
+      <section class="card recommendation-card">
+        <div class="card-header">
+          <span class="icon">💡</span>
+          <h3>今日のおすすめテーマ</h3>
+          <button class="btn-refresh" onclick="loadRecommendation()" title="更新">↻</button>
+        </div>
+        <div id="recommendation-content">
+          <div class="loading-dots"><span></span><span></span><span></span></div>
+        </div>
+      </section>
+
+      <!-- 記事作成フォーム -->
+      <section class="card form-card">
+        <h3>記事を作成する</h3>
+
+        <div class="form-group">
+          <label>カテゴリ</label>
+          <select id="category-select">
+            <option value="auto">おすすめに従う（自動）</option>
+            <option value="madori">間取り・設計</option>
+            <option value="cost">費用・資金計画</option>
+            <option value="maker">ハウスメーカー・工務店選び</option>
+            <option value="life">建てた後の暮らし・メンテナンス</option>
+            <option value="land">土地探し・立地</option>
+            <option value="interior">インテリア・収納</option>
+            <option value="eco">省エネ・設備・スマートホーム</option>
+            <option value="tips">失敗・後悔しないために</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>キーワード <span class="optional">（任意）</span></label>
+          <input type="text" id="keyword-input" placeholder="例：太陽光発電、間取り、後悔...">
+        </div>
+
+        <button class="btn-create" id="create-btn" onclick="createArticle()">
+          <span class="btn-text">記事を作成する</span>
+          <span class="btn-loading hidden">生成中...</span>
+        </button>
+      </section>
+
+      <!-- 生成された記事 -->
+      <section class="card result-card hidden" id="result-card">
+        <div class="result-header">
+          <h3>生成された記事</h3>
+          <span id="result-meta" class="result-meta"></span>
+        </div>
+
+        <div class="result-section">
+          <div class="result-label">
+            <span>タイトル</span>
+            <button class="btn-copy" onclick="copyText('result-title')">コピー</button>
+          </div>
+          <div class="result-box" id="result-title"></div>
+        </div>
+
+        <div class="result-section">
+          <div class="result-label">
+            <span>メタディスクリプション <span class="seo-badge">SEO</span></span>
+            <button class="btn-copy" onclick="copyText('result-meta-desc')">コピー</button>
+          </div>
+          <div class="result-box" id="result-meta-desc"></div>
+        </div>
+
+        <div class="result-section">
+          <div class="result-label">
+            <span>本文</span>
+            <button class="btn-copy" onclick="copyText('result-body')">全文コピー</button>
+          </div>
+          <div class="result-box body-box" id="result-body"></div>
+        </div>
+
+        <button class="btn-secondary" onclick="createArticle()">もう一度作成する</button>
+      </section>
+    </main>
+  </div>
+
+  <!-- トースト通知 -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
